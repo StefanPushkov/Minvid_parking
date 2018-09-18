@@ -7,6 +7,9 @@ import numpy as np
 import json
 
 from config import CONFIG
+from utils.AESCipher import AESCipher
+
+cipher = AESCipher(CONFIG.AES_PASSPHRASE)
 
 # index that returns -1 instead of throwing ValueError
 def smart_index(bytess, byte):
@@ -36,6 +39,8 @@ class GFHandler(BaseHTTPRequestHandler):
         #
         #
         # structure: start_http_default - \r\n - json - \n - image_as_bytes - end_http_default(40bytes)
+        #
+        # Part "json - \n - image_as_bytes" is encrypted with AES, so we need to decrypt it to proceed
 
         data_bytes = data_bytes[:-40]  # cut end_http_default
 
@@ -43,6 +48,8 @@ class GFHandler(BaseHTTPRequestHandler):
         for i in range(3):
             index = smart_index(data_bytes, b'\n') + 1
             data_bytes = data_bytes[index:]
+
+        data_bytes = cipher.decrypt(data_bytes)
 
         index = smart_index(data_bytes, b'\n') + 1
         json_bytes = data_bytes[:index-1]

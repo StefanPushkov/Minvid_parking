@@ -11,6 +11,8 @@ class Config:
     HTTP_MAX_THREADS = 4
     HTTP_COOKIE = "KfFdxguMgver6kI"
 
+    AES_PASSPHRASE = "The magic words are squeamish ossifrage"
+
     def HTTP_SERVER_URL(self):
         return 'http://' + self.HTTP_SERVER_ADRESS + ":" + str(self.HTTP_SERVER_PORT)
 
