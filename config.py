@@ -9,6 +9,7 @@ class Config:
     #HTTP_SERVER_ADRESS = '192.168.0.80'
     HTTP_SERVER_PORT = 19840
     HTTP_MAX_THREADS = 4
+    HTTP_COOKIE = "KfFdxguMgver6kI"
 
     def HTTP_SERVER_URL(self):
         return 'http://' + self.HTTP_SERVER_ADRESS + ":" + str(self.HTTP_SERVER_PORT)

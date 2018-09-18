@@ -5,22 +5,9 @@ sys.path.append(os.getcwd())
 
 import threading
 import requests
-import time
+from http.server import BaseHTTPRequestHandler, HTTPServer
+
 from config import CONFIG
-
-try:
-    # Python 2.x
-    from SocketServer import ThreadingMixIn
-    from SimpleHTTPServer import SimpleHTTPRequestHandler
-    from BaseHTTPServer import HTTPServer
-except ImportError:
-    # Python 3.x
-    from socketserver import ThreadingMixIn
-    from http.server import BaseHTTPRequestHandler, HTTPServer
-
-
-class ThreadingSimpleServer(ThreadingMixIn, HTTPServer):
-    pass
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -46,15 +33,11 @@ def make_request():
 
 
 if __name__ == '__main__':
-    server = ThreadingSimpleServer((CONFIG.HTTP_SERVER_ADRESS, CONFIG.HTTP_SERVER_PORT), Handler)
+    server = HTTPServer((CONFIG.HTTP_SERVER_ADRESS, CONFIG.HTTP_SERVER_PORT), Handler)
     st = threading.Thread(target=server.serve_forever)
-    st.daemon = False
+    st.daemon = True
     st.start()
 
-    start_time = time.time()
-    t1 = threading.Thread(target=make_request)
-    t1.start()
-    t1.join()
-    print(time.time() - start_time)
+    make_request()
 
     #server.server_close()

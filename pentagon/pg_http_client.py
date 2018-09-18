@@ -3,16 +3,27 @@
 
 import requests
 import cv2
-from json import dumps
+import json
 
-from config import Config
-config = Config()
+from config import CONFIG
 
 def make_request(image):
     image = cv2.imread('/media/data/server_img/analyze/152386286686123_full.png', 0)
 
-    files = {'shape': str(dumps(image.shape)), 'image': image.tobytes()}
+    json_string = json.dumps({"shape": (480, 752), "cookie": CONFIG.HTTP_COOKIE + "d"})
+    data = bytes(json_string, "ascii")
+    data += b"\n"  #for easy separation
+    data += image.tobytes()
 
-    r = requests.post(config.HTTP_SERVER_URL(), headers={'Content-Type': 'image/gif'}, files=files)
+    files = {'data': data}
+
+    r = requests.post(CONFIG.HTTP_SERVER_URL(), files=files)
+
+    print(r.status_code)
+    print(r.headers)
+    print(r.content)
 
     return r.json()
+
+if __name__ == '__main__':
+    print(make_request(1))
