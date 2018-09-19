@@ -1,6 +1,6 @@
 from godfather.gf_main import GFMain
 from pentagon.pg_main import PGMain
-from asta.a_socket_client import make_shot
+from api.a_socket_client import make_shot
 
 #GFMain()
 
@@ -16,12 +16,12 @@ def threaded_f():
     print(make_shot('/media/data/server_img/analyze/152386286686123_full.png'))
 
 threads = []
-for i in range(5):
+for i in range(1):
     t = threading.Thread(target=threaded_f)
     t.start()
     threads.append(t)
 
-for i in range(5):
+for i in range(1):
     threads[i].join()
 
 

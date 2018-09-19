@@ -23,7 +23,6 @@ class Config:
     file_limit_gigabytes = 0.1
 
     project_dir = '/media/ydisk/yandex-disk/a_programming/pyProjects/SMART_KPP/carplates_server'
-    #project_dir = os.getcwd()
     stage1_weights = project_dir + '/res/gf_res/seg_plates_unet4_model_smart1_0.tf'
     stage2_weights = project_dir + '/res/gf_res/seg_chars_unet3_model_smart4.tf'
 
