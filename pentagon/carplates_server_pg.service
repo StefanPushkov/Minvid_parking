@@ -1,6 +1,6 @@
 [Service]
 
-Type=forking
+Type=simple
 
 # edit the following 3 lines!
 WorkingDirectory=/media/data/aa_projects_git/carplates_server/pentagon
