@@ -10,11 +10,11 @@ import time
 from config import CONFIG
 
 class PGSocketServer:
-    def __init__(self, json_callback):
+    def __init__(self, callback):
         self.threads_max = CONFIG.SOCKET_MAX_THREADS
         self.threads_count = 0
 
-        self.json_callback = json_callback
+        self.make_shot_and_get_json_string = callback
         self.socket = socket.socket()
         self._start()
 
@@ -45,13 +45,13 @@ class PGSocketServer:
 
         conn, addr = self.socket.accept()
 
-        shot_path_bytes = conn.recv(4096)
-        shot_path = shot_path_bytes.decode('utf8')
-        if shot_path == '-1':
-            print("close PGSocketServer")
-            conn.send(b'')
-        else:
-            conn.send(self.json_callback(shot_path).encode('utf8'))
+        camera_ip_bytes = conn.recv(4096)
+        camera_ip = camera_ip_bytes.decode('utf8')
+
+        json_string = self.make_shot_and_get_json_string(camera_ip)
+        json_bytes = json_string.encode('utf8')
+        conn.send(json_bytes)
+
         conn.close()
 
         self.threads_count -= 1

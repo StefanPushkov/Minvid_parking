@@ -13,24 +13,24 @@ import time
 from pentagon.pg_socket_server import PGSocketServer
 from pentagon.pg_camera_driver import PGCameraDriver
 from pentagon.pg_http_client import make_request
-from json import dumps
+import json
 
 class PGMain:
     def __init__(self):
         self.camera_driver = PGCameraDriver()
-        self.server = PGSocketServer(self.json_callback)
+        self.server = PGSocketServer(self.make_shot_and_get_json_string)
 
     def stop(self):
         self.server.stop()
 
-    def json_callback(self, shot_path):
-        image, path = self.camera_driver.make_shot(shot_path)
+    def make_shot_and_get_json_string(self, shot_path):
+        image, path = self.camera_driver.get_image_by_ip_and_save(shot_path)
 
         json_obj = make_request(image)
         json_obj['plate'] = ''
         json_obj['image'] = shot_path
 
-        return dumps(json_obj)
+        return json.dumps(json_obj)
 
     def save_plate_image(self, image, frame):
         pass

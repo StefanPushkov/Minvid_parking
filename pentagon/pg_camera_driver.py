@@ -4,7 +4,8 @@
 import cv2
 import numpy as np
 import requests
-import time
+import datetime
+import os
 
 from config import CONFIG
 
@@ -25,20 +26,38 @@ class PGCameraDriver:
         # cookie_str: GXSU=NYyVwylzcdFJOT9
         self.cookie = cookie_str
 
-    def generate_image_path(self):
-        #TODO add realization!!!
-        pass
+    @staticmethod
+    def generate_image_path():
+        path = CONFIG.images_root_folder
+
+        now = datetime.datetime.now()
+
+        # filename = 'image_15_07_17_733178.png'
+        filename = 'image_' + \
+                   str(now.time()).replace('.', '_').replace(':', '_') +\
+                   '.png'
+
+        path = os.path.join(path,
+                            str(now.year),
+                            str(now.month),
+                            str(now.day),
+                            filename)
+
+        return path
 
 
-    def make_shot(self, camera_ip):
+    def get_image_by_ip_and_save(self, camera_ip):
         self.auth()
-        r = requests.get('http://192.168.60.9/scapture',
+
+        url = 'http://' + camera_ip + '/scapture'  # example: http://192.168.60.9/scapture
+        r = requests.get(url,
                          headers={'Connection': 'keep-alive', 'Cookie': self.cookie})
 
         array = np.frombuffer(r.content, dtype=np.uint8)
         image = cv2.imdecode(array, cv2.IMREAD_GRAYSCALE)
 
         path = self.generate_image_path()
+        os.makedirs(os.path.dirname(path), exist_ok=True)
         cv2.imwrite(path, image)
 
         return image, path

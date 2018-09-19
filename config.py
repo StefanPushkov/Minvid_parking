@@ -19,7 +19,8 @@ class Config:
     #def SOCKET_SERVER_URL(self):
     #    return self.SOCKET_SERVER_ADRESS + ":" + str(self.SOCKET_SERVER_PORT)
 
-    images_root_folder = os.getcwd() + '/output/images'
+    #images_root_folder = os.getcwd() + '/output/images'
+    images_root_folder = '/tmp/car_shots'
     file_limit_gigabytes = 0.1
 
     project_dir = '/media/ydisk/yandex-disk/a_programming/pyProjects/SMART_KPP/carplates_server'
