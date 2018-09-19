@@ -6,8 +6,10 @@
 
 import os
 import sys
-os.chdir(os.getcwd() + '/..')
-sys.path.append(os.getcwd())
+
+if __name__ == '__main__':
+    os.chdir(os.getcwd() + '/..')
+    sys.path.append(os.getcwd())
 
 import time
 from pentagon.pg_socket_server import PGSocketServer
@@ -23,12 +25,12 @@ class PGMain:
     def stop(self):
         self.server.stop()
 
-    def make_shot_and_get_json_string(self, shot_path):
-        image, path = self.camera_driver.get_image_by_ip_and_save(shot_path)
+    def make_shot_and_get_json_string(self, camera_ip):
+        image, path = self.camera_driver.get_image_by_ip_and_save(camera_ip)
 
         json_obj = make_request(image)
         json_obj['plate'] = ''
-        json_obj['image'] = shot_path
+        json_obj['image'] = path
 
         return json.dumps(json_obj)
 

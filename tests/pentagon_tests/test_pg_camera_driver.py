@@ -1,7 +1,13 @@
 import unittest
 
 import os
+import sys
 import cv2
+import numpy as np
+
+print(os.getcwd())
+sys.path.append(os.getcwd())
+
 
 import pentagon.pg_camera_driver as CD
 from config import CONFIG
@@ -16,7 +22,7 @@ class PGCameraDriverTest(unittest.TestCase):
         path2 = CD.PGCameraDriver.generate_image_path()
         self.assertNotEqual(path, path2)
 
-    @unittest.skip('Run only on production server where it is a camera')
+    #@unittest.skip('Run only on production server where it is a camera')
     def test_get_image_by_ip_and_save(self):
         image, path = CD.PGCameraDriver().get_image_by_ip_and_save('192.168.60.9')
 
@@ -26,9 +32,9 @@ class PGCameraDriverTest(unittest.TestCase):
         self.assertTrue(nchannels == 2 or nchannels == 3)
 
         if nchannels == 2:
-            self.assertEqual(image, cv2.imread(path, 0))
+            self.assertTrue(np.all(image == cv2.imread(path, 0)))
         if nchannels == 3:
-            self.assertEqual(image, cv2.imread(path, -1))
+            self.assertTrue(np.all(image == cv2.imread(path, -1)))
 
 if __name__ == "__main__":
     unittest.main()

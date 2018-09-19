@@ -21,28 +21,25 @@ shot_data = {
 # camera_ip is a local ip adress, for example, 192.168.0.100
 def make_shot(camera_ip):
     json_obj = None
-    #try:
-    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-    client.settimeout(8.0)
-    client.connect((config.SOCKET_SERVER_ADRESS, config.SOCKET_SERVER_PORT))
+        client.settimeout(8.0)
+        client.connect((config.SOCKET_SERVER_ADRESS, config.SOCKET_SERVER_PORT))
 
-    client.send(str.encode(camera_ip))
-    json_bytes = client.recv(4096)
+        client.send(str.encode(camera_ip))
+        json_bytes = client.recv(4096)
 
-    json_string = json_bytes.decode('utf8')
-    print("json_string", json_string)
-    json_obj = json.loads(json_string)
+        json_string = json_bytes.decode('utf8')
+        json_obj = json.loads(json_string)
 
-    client.shutdown(socket.SHUT_RDWR)
-    client.close()
+        client.shutdown(socket.SHUT_RDWR)
+        client.close()
 
-    '''
     except Exception as msg:
         json_obj = {
             'status': -3,
             'error': msg
         }
-    '''
 
     return json_obj

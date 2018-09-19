@@ -47,7 +47,7 @@ class PGCameraDriver:
 
 
     def get_image_by_ip_and_save(self, camera_ip):
-        self.auth()
+        self.auth(camera_ip)
 
         url = 'http://' + camera_ip + '/scapture'  # example: http://192.168.60.9/scapture
         r = requests.get(url,
