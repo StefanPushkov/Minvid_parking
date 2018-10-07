@@ -3,7 +3,7 @@ import json
 from threading import Thread
 
 SERVER_ADDRESS = '127.0.0.1'
-SERVER_PORT = 19701
+SERVER_PORT = 2211
 
 class SocketManager:
     def __init__(self, json_callback):
@@ -73,4 +73,4 @@ if __name__ == "__main__":
 
     print(get_json_from_request('1'))
 
-    sockMan.stop()
+    #sockMan.stop()

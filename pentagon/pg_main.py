@@ -14,6 +14,8 @@ if __name__ == '__main__':
 import time
 from pentagon.pg_socket_server import PGSocketServer
 from pentagon.pg_camera_driver import PGCameraDriver
+from pentagon.pg_moxa_driver import PGMoxaDriver
+from pentagon.pg_database import Database
 from pentagon.pg_http_client import make_request
 import json
 
@@ -21,9 +23,16 @@ class PGMain:
     def __init__(self):
         self.camera_driver = PGCameraDriver()
         self.server = PGSocketServer(self.make_shot_and_get_json_string)
+        self.moxa = PGMoxaDriver(self.on_car_detected)
+        self.db = Database()
 
     def stop(self):
         self.server.stop()
+
+    def on_car_detected(self, camera_ip:str):
+        json_str = self.make_shot_and_get_json_string(camera_ip)
+        json_obj = json.loads(json_str)
+        self.db.add_shot(json_obj)
 
     def make_shot_and_get_json_string(self, camera_ip):
         image, path = self.camera_driver.get_image_by_ip_and_save(camera_ip)
