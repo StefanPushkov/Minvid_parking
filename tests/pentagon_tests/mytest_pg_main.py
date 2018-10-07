@@ -18,9 +18,11 @@ CONFIG.ENTRANCES = [CONFIG.Entrance(name='TEST',moxa_ip='127.0.0.1:%s' % str(POR
 CONFIG.DATABASE_PATH = CONFIG.PROJECT_DIR + '/tests/test_res/test_shots.db'
 
 from pentagon.pg_main import PGMain
+from pentagon.pg_database import Database
 
 import json
 import time
+import sqlite3
 from threading import Thread
 
 class PGMainTest():
@@ -68,7 +70,14 @@ class PGMainTest():
         time.sleep(2)
 
         pgm = PGMain()
-        pgm.db.c.execute('DELETE FROM %s' % pgm.db.SHOTS_TABLE_NAME)
+        db = Database()
+
+        conn = sqlite3.connect(CONFIG.DATABASE_PATH)
+        c = conn.cursor()
+        c.execute('DELETE FROM %s' % db.SHOTS_TABLE_NAME)
+        conn.commit()
+        c.close()
+        conn.close()
 
         time.sleep(2)
         print('Activating coil 1')
@@ -83,10 +92,19 @@ class PGMainTest():
         print('Deactivating coil 2')
         is_moxa_di_1_active = 0
 
-        query_str = 'SELECT count(*) FROM ' + pgm.db.SHOTS_TABLE_NAME
-        query = pgm.db.c.execute(query_str)
-        pgm.db.conn.commit()
+        #wait for requests to finish
+        for i in range(10):
+            print('sleeping %d/10' % (i+1))
+            time.sleep(1)
+
+        conn = sqlite3.connect(CONFIG.DATABASE_PATH)
+        c = conn.cursor()
+        query_str = 'SELECT count(*) FROM ' + db.SHOTS_TABLE_NAME
+        query = c.execute(query_str)
         num_rows_added = query.fetchall()[0][0]
+        conn.commit()
+        c.close()
+        conn.close()
         print('Totally added %d rows' % num_rows_added)
 
         if num_rows_added != 2:

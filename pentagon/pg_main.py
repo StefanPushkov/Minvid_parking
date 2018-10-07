@@ -12,6 +12,8 @@ if __name__ == '__main__':
     sys.path.append(os.getcwd())
 
 import time
+from threading import Thread
+
 from pentagon.pg_socket_server import PGSocketServer
 from pentagon.pg_camera_driver import PGCameraDriver
 from pentagon.pg_moxa_driver import PGMoxaDriver
@@ -29,7 +31,10 @@ class PGMain:
     def stop(self):
         self.server.stop()
 
-    def on_car_detected(self, camera_ip:str):
+    def on_car_detected(self, camera_ip: str):
+        Thread(target= lambda : self.on_car_detected_t(camera_ip)).start()
+
+    def on_car_detected_t(self, camera_ip:str):
         json_str = self.make_shot_and_get_json_string(camera_ip)
         json_obj = json.loads(json_str)
         self.db.add_shot(json_obj)
@@ -49,6 +54,9 @@ class PGMain:
 
 
 if __name__ == '__main__':
+    import logging
+    logging.basicConfig(level=logging.DEBUG)
+
     PGMain()
 
     while 1:
