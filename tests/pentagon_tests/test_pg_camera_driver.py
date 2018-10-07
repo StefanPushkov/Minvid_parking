@@ -1,12 +1,16 @@
 import unittest
 
-import os
-import sys
 import cv2
 import numpy as np
 
-print(os.getcwd())
-sys.path.append(os.getcwd())
+import os
+import sys
+# gets path of project directory
+def get_base_dir_by_name(name):
+    path = os.getcwd()
+    lastchar = path.find(name) + len(name)
+    return os.getcwd()[0:lastchar]
+sys.path.append(get_base_dir_by_name('carplates_server'))
 
 
 import pentagon.pg_camera_driver as CD

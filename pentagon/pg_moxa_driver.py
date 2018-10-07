@@ -33,6 +33,8 @@ class PGMoxaDriver:
                     logger.warning('Error requesting moxa with url %s, ERR: %s' % (moxa_url,str(e)))
                     continue
 
+                logger.debug('Got response: ' + str(r.content))
+
                 di = r.json()['io']['di']
 
                 for di_pin in di:
@@ -44,12 +46,12 @@ class PGMoxaDriver:
                                 logger.debug('Pin deactivated: %s in ENTRANCE: %s' %
                                              (str(di_pin['diIndex']), str(entrance))
                                              )
-                            entrance.was_pin_active[i] = False
+                            entrance.was_pins_active[i] = False
                         if di_pin['diStatus'] == 1:
-                            if entrance.was_pin_active[i]:
+                            if entrance.was_pins_active[i]:
                                 continue
                             logger.debug('Pin activated: %s in ENTRANCE: %s' % (str(di_pin), str(entrance)))
-                            entrance.was_pin_active[i] = True
+                            entrance.was_pins_active[i] = True
 
                             self.car_detected_callback(entrance.cam_ips[i])
 

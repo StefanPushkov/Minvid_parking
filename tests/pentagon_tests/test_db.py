@@ -7,7 +7,7 @@ def get_base_dir_by_name(name):
     path = os.getcwd()
     lastchar = path.find(name) + len(name)
     return os.getcwd()[0:lastchar]
-sys.path.append(get_base_dir_by_name('parkomat_app'))
+sys.path.append(get_base_dir_by_name('carplates_server'))
 
 
 from pentagon.pg_database import Database
