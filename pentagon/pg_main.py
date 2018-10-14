@@ -13,6 +13,7 @@ if __name__ == '__main__':
 
 import time
 from threading import Thread
+import logging
 
 from pentagon.pg_socket_server import PGSocketServer
 from pentagon.pg_camera_driver import PGCameraDriver
@@ -20,6 +21,11 @@ from pentagon.pg_moxa_driver import PGMoxaDriver
 from pentagon.pg_database import Database
 from pentagon.pg_http_client import make_request
 import json
+
+from config import CONFIG
+
+logger = logging.getLogger(__name__)
+logger.setLevel(CONFIG.PG_MAIN_LOGGER_LEVEL)
 
 class PGMain:
     def __init__(self):
@@ -31,31 +37,52 @@ class PGMain:
     def stop(self):
         self.server.stop()
 
+
     def on_car_detected(self, camera_ip: str):
         Thread(target= lambda : self.on_car_detected_t(camera_ip)).start()
 
     def on_car_detected_t(self, camera_ip:str):
         json_str = self.make_shot_and_get_json_string(camera_ip)
         json_obj = json.loads(json_str)
-        self.db.add_shot(json_obj)
+
+        if json_obj['status'] == 1:
+            logger.info('RECOGNITION DONE, saving to db')
+            self.db.add_shot(json_obj)
+        else:
+            logger.warning('Answer has error status! answer: ' + json.dumps(json_obj))
+
 
     def make_shot_and_get_json_string(self, camera_ip):
         image, path = self.camera_driver.get_image_by_ip_and_save(camera_ip)
 
+        if image is None:
+            json_obj = {'status': -2,
+                        'error': 'Error communicating with camera'}
+            return json.dumps(json_obj)
+
         json_obj = make_request(image)
+
+        if json_obj is None:
+            json_obj = {'status': -1,
+                        'error': 'Error communicating with Sekkar Engine'}
+            return json.dumps(json_obj)
+
         json_obj['plate'] = ''
         json_obj['image'] = path
 
         return json.dumps(json_obj)
 
-    def save_plate_image(self, image, frame):
-        pass
-
 
 
 if __name__ == '__main__':
     import logging
-    logging.basicConfig(level=logging.DEBUG)
+    fh = logging.FileHandler(CONFIG.PROJECT_DIR + '/pg_main.log')
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    fh.setFormatter(formatter)
+    ch = logging.StreamHandler(sys.stdout)
+    logging.basicConfig(level=logging.DEBUG, handlers=[ch, fh])
+    logging.critical('START SERVER')
+    logging.getLogger('urllib3.connectionpool').setLevel(logging.WARNING)
 
     PGMain()
 

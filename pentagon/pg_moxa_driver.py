@@ -24,11 +24,14 @@ class PGMoxaDriver:
 
     def _loop(self):
         while(self.isActive):
+            logger.debug('START NEW REQUEST CYCLE')
             for entrance in CONFIG.ENTRANCES:
                 moxa_url = CONFIG.GEN_MOXA_URL(entrance.moxa_ip)
                 try:
-                    r = requests.get(moxa_url, headers={'Content-Type': "application/json",
-                                                        "Accept": 'vdn.dac.v1'})
+                    r = requests.get(moxa_url,
+                                     timeout=1,
+                                     headers={'Content-Type': "application/json",
+                                              "Accept": 'vdn.dac.v1'})
                 except Exception as e:
                     logger.warning('Error requesting moxa with url %s, ERR: %s' % (moxa_url,str(e)))
                     continue

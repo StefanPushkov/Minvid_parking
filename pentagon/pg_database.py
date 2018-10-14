@@ -32,6 +32,11 @@ class Database:
         c = conn.cursor()
 
         query = 'INSERT INTO ' + self.SHOTS_TABLE_NAME + ' VALUES (?,?,?,?)'
+        if 'number' not in json_obj \
+            or 'frame' not in json_obj \
+            or 'plate' not in json_obj \
+            or 'image' not in json_obj:
+            return
         values = [json_obj['number'], json_obj['frame'], json_obj['plate'], json_obj['image']]
         values = list(map(str, values)) #conversion of int (values[0]) to str is ok here
         c.executemany(query, [values])  # actually executes only once

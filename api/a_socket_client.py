@@ -16,6 +16,15 @@ shot_data = {
     'plate': '/tmp/..', # path to cropped plateno fame, not used now
     'image': '/tmp/..', # path to photo
 }
+
+STATUS_OK = 1
+    STATUS_UNRECOGNIZED = 0
+    STATUS_ERROR_GX = -1
+    STATUS_ERROR_CAMERA = -2
+    STATUS_ERROR_TIMEOUT = -3
+    STATUS_ERROR_GETFRAME = -4
+    STATUS_ERROR_CPP = -5
+    STATUS_ERROR_CREDIT = -6
 '''
 
 # camera_ip is a local ip adress, for example, 192.168.0.100

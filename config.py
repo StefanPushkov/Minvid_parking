@@ -90,6 +90,10 @@ class Config:
     DATABASE_NAME = 'shots'
     DATABASE_PATH = PROJECT_DIR + '/res/db/' + DATABASE_NAME + '.db'
 
-    MOXA_LOGGER_LEVEL = logging.DEBUG
+    MOXA_LOGGER_LEVEL = logging.WARNING
+    CAMERA_LOGGER_LEVEL = logging.DEBUG
+    PG_HTTP_CLIENT_LOGGER_LEVEL = logging.DEBUG
+    PG_MAIN_LOGGER_LEVEL = logging.DEBUG
+    LOG_FILE = PROJECT_DIR + '/main.log'
 
 CONFIG = Config()

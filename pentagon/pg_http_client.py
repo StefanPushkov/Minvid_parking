@@ -4,11 +4,15 @@
 import requests
 import cv2
 import json
+import logging
 
 from config import CONFIG
 from utils.AESCipher import AESCipher
 
 cipher = AESCipher(CONFIG.AES_PASSPHRASE)
+
+logger = logging.getLogger(__name__)
+logger.setLevel(CONFIG.PG_HTTP_CLIENT_LOGGER_LEVEL)
 
 def make_request(image):
     json_string = json.dumps({"shape": (480, 752), "cookie": CONFIG.HTTP_COOKIE})
@@ -20,13 +24,18 @@ def make_request(image):
 
     files = {'data': data}
 
-    r = requests.post(CONFIG.HTTP_SERVER_URL(), files=files)
+    try:
+        r = requests.post(CONFIG.HTTP_SERVER_URL(), files=files, timeout=10)
+    except Exception as e:
+        logger.warning('Error communicating with Computational Server, ERR: %s' % str(e))
+        return None
 
-    #print(r.status_code)
-    #print(r.headers)
-    #print(r.content)
+    try:
+        return r.json()
+    except Exception as e:
+        logger.warning('Error parsing json, ERR: %s' % str(e))
+        return None
 
-    return r.json()
 
 if __name__ == '__main__':
     print(make_request(1))

@@ -113,7 +113,13 @@ class PGMainTest():
 
 if __name__ == "__main__":
     import logging
-    logging.basicConfig(level=logging.DEBUG)
+    fh = logging.FileHandler(CONFIG.PROJECT_DIR + '/tests/pentagon_tests/mytest_pg_main.log')
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    fh.setFormatter(formatter)
+    ch = logging.StreamHandler(sys.stdout)
+    logging.basicConfig(level=logging.DEBUG, handlers=[ch, fh])
+    logging.critical('START SERVER')
+    logging.getLogger('urllib3.connectionpool').setLevel(logging.WARNING)
 
     pgmt = PGMainTest()
     pgmt.test_shooting_on_moxa()
