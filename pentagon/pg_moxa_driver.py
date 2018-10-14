@@ -53,7 +53,7 @@ class PGMoxaDriver:
                         if di_pin['diStatus'] == 1:
                             if entrance.was_pins_active[i]:
                                 continue
-                            logger.debug('Pin activated: %s in ENTRANCE: %s' % (str(di_pin), str(entrance)))
+                            logger.info('Pin activated: %s in ENTRANCE: %s' % (str(di_pin), str(entrance)))
                             entrance.was_pins_active[i] = True
 
                             self.car_detected_callback(entrance.cam_ips[i])

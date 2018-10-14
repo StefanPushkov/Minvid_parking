@@ -36,7 +36,7 @@ class SocketManager:
                 conn.send(b'')
             else:
                 conn.send(self.json_callback(camera_ip).encode('utf8'))
-            conn.close()
+            conn.stop()
 
 def get_json_from_request(camera_ip):
     json_obj = None

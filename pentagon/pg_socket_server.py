@@ -52,6 +52,6 @@ class PGSocketServer:
         json_bytes = json_string.encode('utf8')
         conn.send(json_bytes)
 
-        conn.close()
+        conn.stop()
 
         self.threads_count -= 1
