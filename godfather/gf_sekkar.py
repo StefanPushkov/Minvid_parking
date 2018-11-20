@@ -14,7 +14,7 @@ class Sekkar():
         self.load_nets()
 
     def load_nets(self):
-        self.stage1 = unet4()
+        self.stage1 = unet4(image_rows=CONFIG.IMAGE_HEIGHT, image_cols=CONFIG.IMAGE_WIDTH)
         self.stage2 = unet3()
 
         self.stage1.load_weights(CONFIG.stage1_weights)

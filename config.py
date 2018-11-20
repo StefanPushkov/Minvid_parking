@@ -79,7 +79,15 @@ class Config:
     #    return self.SOCKET_SERVER_ADRESS + ":" + str(self.SOCKET_SERVER_PORT)
 
     #images_root_folder = os.getcwd() + '/output/images'
+    #SRC_IMAGES_ROOT_FOLDER = '/media/data/server_img/carplates_trucks'
+    SRC_IMAGES_ROOT_FOLDER = '/media/data/aaadownloadslinux/TEST'
     images_root_folder = '/tmp/car_shots'
+
+    #IMAGE_HEIGHT = 480
+    #IMAGE_WIDTH = 752
+    IMAGE_HEIGHT = 1136
+    IMAGE_WIDTH = 1920
+
     file_limit_gigabytes = 0.1
 
     PROJECT_DIR = get_base_dir_by_name('carplates_server')
@@ -95,6 +103,9 @@ class Config:
     CAMERA_LOGGER_LEVEL = logging.DEBUG
     PG_HTTP_CLIENT_LOGGER_LEVEL = logging.DEBUG
     PG_MAIN_LOGGER_LEVEL = logging.DEBUG
+
+    FILESYSTEM_UTILS_LOGGER_LEVEL = logging.DEBUG
+
     LOG_FILE = PROJECT_DIR + '/main.log'
 
 CONFIG = Config()

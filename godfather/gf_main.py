@@ -4,8 +4,13 @@
 
 import os
 import sys
-os.chdir(os.getcwd() + '/..')
-sys.path.append(os.getcwd())
+# gets path of project directory
+def get_base_dir_by_name(name):
+    path = os.getcwd()
+    lastchar = path.find(name) + len(name)
+    return os.getcwd()[0:lastchar]
+base_dir = get_base_dir_by_name('carplates_server')
+sys.path.append(base_dir)
 
 import threading
 import time
