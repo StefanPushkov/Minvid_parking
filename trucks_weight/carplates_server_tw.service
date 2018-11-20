@@ -3,15 +3,15 @@
 Type=simple
 
 # edit the following 3 lines!
-WorkingDirectory=/media/data/aa_projects_git/carplates_server/pentagon
+WorkingDirectory=/media/data/aa_projects_git/carplates_server/trucks_weight
 User=safic
 Group=safic
 
-ExecStart=/home/safic/anaconda3/envs/tf_env/bin/python /media/data/aa_projects_git/carplates_server/pentagon/pg_main.py
+ExecStart=/home/safic/anaconda3/envs/tf_env/bin/python /media/data/aa_projects_git/carplates_server/trucks_weight/tw_main.py
 # ExecStop=
-ExecReload=/home/safic/anaconda3/envs/tf_env/bin/python /media/data/aa_projects_git/carplates_server/pentagon/pg_main.py
+ExecReload=/home/safic/anaconda3/envs/tf_env/bin/python /media/data/aa_projects_git/carplates_server/trucks_weight/tw_main.py
 
-PIDFile=/tmp/myunit.pid
+PIDFile=/tmp/tw_main.pid
 Restart=always
 RestartSec=10
 

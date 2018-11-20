@@ -11,7 +11,7 @@ ExecStart=/home/safic/anaconda3/envs/tf_env/bin/python /media/data/aa_projects_g
 # ExecStop=
 ExecReload=/home/safic/anaconda3/envs/tf_env/bin/python /media/data/aa_projects_git/carplates_server/pentagon/pg_main.py
 
-PIDFile=/tmp/myunit.pid
+PIDFile=/tmp/pg_main.pid
 Restart=always
 RestartSec=10
 
