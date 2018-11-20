@@ -16,7 +16,7 @@ class GFMainTest(unittest.TestCase):
     def test_answer(self):
         GFMain()
 
-        image = cv2.imread(CONFIG.project_dir + '/tests/test_res/152386286686123_full.png', 0)
+        image = cv2.imread(CONFIG.PROJECT_DIR + '/tests/test_res/152386286686123_full.png', 0)
 
         json_object = make_request(image)
 
@@ -26,7 +26,7 @@ class GFMainTest(unittest.TestCase):
 
     #@unittest.skip('Only if godfather works')
     def test_answer(self):
-        image = cv2.imread(CONFIG.project_dir + '/tests/test_res/152386286686123_full.png', 0)
+        image = cv2.imread(CONFIG.PROJECT_DIR + '/tests/test_res/152386286686123_full.png', 0)
 
         json_object = make_request(image)
 

@@ -15,7 +15,8 @@ logger = logging.getLogger(__name__)
 logger.setLevel(CONFIG.PG_HTTP_CLIENT_LOGGER_LEVEL)
 
 def make_request(image):
-    json_string = json.dumps({"shape": (480, 752), "cookie": CONFIG.HTTP_COOKIE})
+    json_string = json.dumps({"shape": (CONFIG.IMAGE_HEIGHT, CONFIG.IMAGE_WIDTH),
+                              "cookie": CONFIG.HTTP_COOKIE})
     data = bytes(json_string, "ascii")
     data += b"\n"  #for easy separation
     data += image.tobytes()

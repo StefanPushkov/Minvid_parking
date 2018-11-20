@@ -73,6 +73,7 @@ class PGMain:
 
     def make_request_for_plate_number(self, path):
         image = cv2.imread(path, 0)
+        image = image[:1136, :] #(1144,1920) -> (1136,1920)
 
         if image is None:
             logger.warning("Cannot make request: image is None")
