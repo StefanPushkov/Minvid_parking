@@ -3,17 +3,14 @@ import time
 import requests
 import logging
 
-from config import  CONFIG
+import configs.pentagon as config
 
-logger = logging.getLogger('PGMoxaDriver')
-logger.setLevel(CONFIG.MOXA_LOGGER_LEVEL)
 
 class PGMoxaDriver:
     def __init__(self, car_detected_callback):
         self.car_detected_callback = car_detected_callback
         self._start()
 
-    ##### Start lifecycle functions #####
     def _start(self):
         self.thread = Thread(target=self._loop)
         self.isActive = True
@@ -23,20 +20,20 @@ class PGMoxaDriver:
         self.isActive = False
 
     def _loop(self):
-        while(self.isActive):
-            logger.debug('START NEW REQUEST CYCLE')
-            for entrance in CONFIG.ENTRANCES:
-                moxa_url = CONFIG.GEN_MOXA_URL(entrance.moxa_ip)
+        while self.isActive:
+            logging.debug('START NEW REQUEST CYCLE')
+            for entrance in config.ENTRANCES:
+                moxa_url = config.gen_moxa_url(entrance.moxa_ip)
                 try:
                     r = requests.get(moxa_url,
                                      timeout=1,
                                      headers={'Content-Type': "application/json",
                                               "Accept": 'vdn.dac.v1'})
                 except Exception as e:
-                    logger.warning('Error requesting moxa with url %s, ERR: %s' % (moxa_url,str(e)))
+                    logging.error('Error requesting moxa with url %s, ERR: %s' % (moxa_url, str(e)))
                     continue
 
-                logger.debug('Got response: ' + str(r.content))
+                logging.debug('Got response: ' + str(r.content))
 
                 di = r.json()['io']['di']
 
@@ -46,19 +43,16 @@ class PGMoxaDriver:
                             continue
                         if di_pin['diStatus'] == 0:
                             if entrance.was_pins_active[i]:
-                                logger.debug('Pin deactivated: %s in ENTRANCE: %s' %
+                                logging.debug('Pin deactivated: %s in ENTRANCE: %s' %
                                              (str(di_pin['diIndex']), str(entrance))
                                              )
                             entrance.was_pins_active[i] = False
                         if di_pin['diStatus'] == 1:
                             if entrance.was_pins_active[i]:
                                 continue
-                            logger.info('Pin activated: %s in ENTRANCE: %s' % (str(di_pin), str(entrance)))
+                            logging.debug('Pin activated: %s in ENTRANCE: %s' % (str(di_pin), str(entrance)))
                             entrance.was_pins_active[i] = True
 
                             self.car_detected_callback(entrance.cam_ips[i])
 
-
             time.sleep(0.5)
-
-    ##### End lifecycle functions #####

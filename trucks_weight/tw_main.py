@@ -67,6 +67,8 @@ class PGMain:
         if number is None:
             logger.warning('Failed to process recognition!')
             return
+        else:
+            logger.debug("Got recognition: " + number)
 
         copy_image_with_recog_in_name(path, number)
 

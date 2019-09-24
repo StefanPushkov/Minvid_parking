@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Heimdallr</title>
+    <script src="{{ jquery }}"></script>
+</head>
+<body>
+    <table id="plates">
+        <thead>
+            <tr>
+                <td style="text-align: center;">Plate number</td>
+                <td style="text-align: center;">Photo</td>
+            </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+    </table>
+
+    <script type="text/javascript">
+        $( document ).ready(function () {
+                loadInitial();
+            }
+        );
+
+        function loadInitial() {
+            $.get("/photos?method=initial", function(data) {
+                $.each(data, function(i, obj) {
+                    $('#plates').find('tbody')
+                        .append($('<tr>')
+                            .append($('<td>')
+                                .text(obj.plateno)
+                            )
+                            .append($('<td>')
+                                .append($('<img>')
+                                    .attr('src', obj.full_image)
+                                    .attr('width', 960)
+                                    .attr('height', 570)
+                                )
+                            )
+                            .attr('id', obj.rowid)
+                            .attr('class', 'table-row')
+                        )
+                });
+                setTimeout(doPoll, 5000);
+            });
+        }
+
+        function doPoll() {
+            let max = $('.table-row').get().reduce(function(a, b){
+                return Math.max(a, b.id)
+            }, Number.NEGATIVE_INFINITY);
+
+            $.get("/photos?method=new&last_id=" + max, function(data) {
+                $.each(data, function(i, obj) {
+                    $('#plates').find('tbody')
+                        .prepend($('<tr>')
+                            .append($('<td>')
+                                .text(obj.plateno)
+                            )
+                            .append($('<td>')
+                                .append($('<img>')
+                                    .attr('src', obj.full_image)
+                                    .attr('width', 960)
+                                    .attr('height', 570)
+                                )
+                            )
+                            .attr('id', obj.rowid)
+                            .attr('class', 'table-row')
+                        )
+                });
+                setTimeout(doPoll, 5000);
+            });
+        }
+
+        function loadMore() {
+            let min = $('.table-row').get().reduce(function(a, b){
+                return Math.min(a, b.id)
+            }, Number.POSITIVE_INFINITY);
+
+            $.get("/photos?method=old&last_id=" + min, function(data) {
+                $.each(data, function(i, obj) {
+                    $('#plates').find('tbody')
+                        .append($('<tr>')
+                            .append($('<td>')
+                                .text(obj.plateno)
+                            )
+                            .append($('<td>')
+                                .append($('<img>')
+                                    .attr('src', obj.full_image)
+                                    .attr('width', 960)
+                                    .attr('height', 570)
+                                )
+                            )
+                            .attr('id', obj.rowid)
+                            .attr('class', 'table-row')
+                        )
+                });
+            });
+        }
+    </script>
+</body>
+</html>

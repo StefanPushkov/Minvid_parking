@@ -1,0 +1,20 @@
+[Service]
+
+Type=simple
+
+# edit the following 3 lines!
+WorkingDirectory=/media/data/aa_projects_git/carplates_server/godfather
+User=safic
+Group=safic
+
+ExecStart=/home/safic/anaconda3/envs/tf_env/bin/python /media/data/aa_projects_git/carplates_server/godfather/gf_main.py
+# ExecStop=
+ExecReload=/home/safic/anaconda3/envs/tf_env/bin/python /media/data/aa_projects_git/carplates_server/godfather/gf_main.py
+
+PIDFile=/tmp/gf_main.pid
+Restart=always
+RestartSec=10
+
+[Install]
+
+WantedBy=multi-user.target

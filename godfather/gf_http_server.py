@@ -1,24 +1,17 @@
 # This is the multithreaded http server implementation
 
+import base64
+import json
 
 from socketserver import ThreadingMixIn
 from http.server import BaseHTTPRequestHandler, HTTPServer
-import numpy as np
-import json
 
-from config import CONFIG
-from utils.AESCipher import AESCipher
+import configs.godfather as config
 
-cipher = AESCipher(CONFIG.AES_PASSPHRASE)
+from aes_cipher import AESCipher
 
-# index that returns -1 instead of throwing ValueError
-def smart_index(bytess, byte):
-    index = -1
-    try:
-        index = bytess.index(byte)
-    except ValueError:
-        pass
-    return index
+cipher = AESCipher(config.AES_PASSPHRASE)
+
 
 class ThreadingSimpleServer(ThreadingMixIn, HTTPServer):
     pass
@@ -26,50 +19,43 @@ class ThreadingSimpleServer(ThreadingMixIn, HTTPServer):
 
 class GFHandler(BaseHTTPRequestHandler):
 
-    # read image to np.array, predict -> get json answer, send answer
     def do_POST(self):
         data_bytes = self.rfile.read(int(self.headers['Content-Length']))
-        # first 200 bytes of data_bytes:
-        #
-        # b'--24f1c846973f90d95eff87e2ebc2598b\r\n
-        # Content-Disposition: form-data; name="data"; filename="data"\r\n
-        # \r\n
-        # {"shape": [480, 752], "cookie": "KfFdxguMgver6kI"}\n
-        # HP_mqnlnggn|\x84\x82|x~wnea`absiemvz~\x83\x88\x87\x80|\x86\x95\x96\x8d\x86\x8c\x8c\x8a\x92\xa1\xa4\x9d\x9c'
-        #
-        #
-        # structure: start_http_default - \r\n - json - \n - image_as_bytes - end_http_default(40bytes)
-        #
-        # Part "json - \n - image_as_bytes" is encrypted with AES, so we need to decrypt it to proceed
+        body = cipher.decrypt(data_bytes)
 
-        data_bytes = data_bytes[:-40]  # cut end_http_default
+        json_request = json.loads(body)
 
-        #cut start_http_default:
-        for i in range(3):
-            index = smart_index(data_bytes, b'\n') + 1
-            data_bytes = data_bytes[index:]
+        cookie = json_request['cookie']
 
-        data_bytes = cipher.decrypt(data_bytes)
+        image = json_request['image'].encode('utf-8')
+        image = base64.b64decode(image)
 
-        index = smart_index(data_bytes, b'\n') + 1
-        json_bytes = data_bytes[:index-1]
-        image_bytes = data_bytes[index:]
-
-        json_string = json_bytes.decode("ascii")
-        json_object = json.loads(json_string)
-
-        if json_object["cookie"] != CONFIG.HTTP_COOKIE:
+        if cookie != config.HTTP_COOKIE:
             self.send_response(401)  # 401 Unauthorized
             self.end_headers()
             self.wfile.write(b'{"error":"Unknown user!"}')
             return
 
-        image = np.frombuffer(image_bytes, dtype=np.uint8)
-        image = image.reshape(json_object["shape"])
+        encr_response = ''
 
-        answer = self.server.predict(image)
+        self.server.alpr.predict(image)
+        if 'last_image' in json_request and json_request['last_image']:
+            results = list()
+            self.server.alpr.block_until_done()
+            for result in self.server.alpr.get_results():
+                results.append(result)
+            results = list(filter(lambda a: a is not None, results))
+            answer = max(set(results), key=results.count)
+            if config.ENABLE_DB:
+                self.server.db.add_shot(answer, image)
+
+            response = json.dumps({'cookie': config.HTTP_COOKIE, 'plate': answer})
+            encr_response = cipher.encrypt(response)
 
         self.send_response(200)
         self.end_headers()
-        self.wfile.write(bytes(answer, 'utf8'))
+        if type(encr_response) == bytes:
+            self.wfile.write(bytes(encr_response))
+        else:
+            self.wfile.write(bytes(encr_response, 'utf-8'))
         return

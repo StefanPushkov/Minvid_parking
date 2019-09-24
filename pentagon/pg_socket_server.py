@@ -7,25 +7,24 @@ import socket
 from threading import Thread
 import time
 
-from config import CONFIG
+import configs.pentagon as config
+
 
 class PGSocketServer:
     def __init__(self, callback):
-        self.threads_max = CONFIG.SOCKET_MAX_THREADS
+        self.is_active = False
+        self.threads_max = config.SOCKET_MAX_THREADS
         self.threads_count = 0
 
         self.make_shot_and_get_json_string = callback
         self.socket = socket.socket()
         self._start()
 
-
     def _start(self):
         self.is_active = True
-        self.socket.bind((CONFIG.SOCKET_SERVER_ADRESS, CONFIG.SOCKET_SERVER_PORT))
-        self.socket.listen(10) #length of queue
-        #self.socket.settimeout(0.01)
+        self.socket.bind((config.SOCKET_SERVER_ADDRESS, config.SOCKET_SERVER_PORT))
+        self.socket.listen(10)  # length of queue
         Thread(target=self._loop).start()
-
 
     def stop(self):
         self.is_active = False
@@ -39,7 +38,6 @@ class PGSocketServer:
 
             time.sleep(0.01)
 
-
     def _process_request(self):
         self.threads_count += 1
 
@@ -52,6 +50,6 @@ class PGSocketServer:
         json_bytes = json_string.encode('utf8')
         conn.send(json_bytes)
 
-        conn.stop()
+        conn.close()
 
         self.threads_count -= 1

@@ -1,35 +1,31 @@
 # Client that requests ip camera for image
 
 
-import cv2
-import numpy as np
 import requests
 import datetime
 import os
 import logging
 
-from config import CONFIG
+import configs.pentagon as config
 
-logger = logging.getLogger('PGCameraDriver')
-logger.setLevel(CONFIG.CAMERA_LOGGER_LEVEL)
 
 class PGCameraDriver:
 
     cookie = None
 
     def auth(self, camera_ip) -> bool:
-        url = 'http://' + camera_ip + '/login.html' # camera_ip example: 192.168.60.9
+        url = 'http://' + camera_ip + '/login.html'
         try:
             r = requests.post(url,
                               data={'p_send': '1', 'p_username': 'admin', 'p_passw': 'Sinergija777'},
                               headers={'Connection': 'keep-alive'},
-                              timeout = 2)
+                              timeout=2)
         except Exception as e:
-            logger.warning('Error requesting camera with url %s, ERR: %s' % (url, str(e)))
+            logging.error('Error requesting camera with url %s, ERR: %s' % (url, str(e)))
             return False
 
         if 'Set-Cookie' not in r.headers:
-            logger.warning('No Set-Cookie in headers!')
+            logging.warning('No Set-Cookie in headers!')
             return False
 
         raw_cookie = r.headers['Set-Cookie']
@@ -42,7 +38,7 @@ class PGCameraDriver:
 
     @staticmethod
     def generate_image_path():
-        path = CONFIG.images_root_folder
+        path = config.IMAGE_ROOT_FOLDER
 
         now = datetime.datetime.now()
 
@@ -59,8 +55,7 @@ class PGCameraDriver:
 
         return path
 
-
-    def get_image_by_ip_and_save(self, camera_ip):
+    def get_image_by_ip(self, camera_ip):
         self.auth(camera_ip)
 
         url = 'http://' + camera_ip + '/scapture'  # example: http://192.168.60.9/scapture
@@ -68,18 +63,13 @@ class PGCameraDriver:
             r = requests.get(url,
                              headers={'Connection': 'keep-alive', 'Cookie': self.cookie})
         except Exception as e:
-            logger.warning('Error requesting camera with url %s, ERR: %s' % (url, str(e)))
+            logging.error('Error requesting camera with url %s, ERR: %s' % (url, str(e)))
             return None, None
 
-        array = np.frombuffer(r.content, dtype=np.uint8)
-        image = cv2.imdecode(array, cv2.IMREAD_GRAYSCALE)
+        image = r.content
 
         if image is None:
-            logger.warning('Error reading image from camera with url %s' % url)
+            logging.error('Error reading image from camera with url %s' % url)
             return None, None
 
-        path = self.generate_image_path()
-        os.makedirs(os.path.dirname(path), exist_ok=True)
-        cv2.imwrite(path, image)
-
-        return image, path
+        return image

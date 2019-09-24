@@ -2,7 +2,6 @@
 
 
 import requests
-import cv2
 import json
 import logging
 

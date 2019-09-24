@@ -48,6 +48,8 @@ def copy_image_with_recog_in_name(src_img_path, recog_str):
 
     if ret != 0:
         logger.warning("Failed to perform command '%s'" % command)
+    else:
+        logger.debug("Successfully done: '%s'" % command)
 
 
 
@@ -81,8 +83,12 @@ def find_new_files(dir_to_search_in: str, create_time: float):
 
 
 def find_files_added_in_last_5_sec() -> []:
-    #find last month directory
-    last_month_dir = find_last_directory_in(CONFIG.SRC_IMAGES_ROOT_FOLDER)
+    #find last directory
+    last_year_dir = find_last_directory_in(CONFIG.SRC_IMAGES_ROOT_FOLDER)
+    if last_year_dir is None:
+        return []
+
+    last_month_dir = find_last_directory_in(last_year_dir)
     if last_month_dir is None:
         return []
 
